@@ -1,3 +1,8 @@
+individual_temperature_range={
+  'PASSIVE_COOLING':{'lowerLimit':0, 'upperLimit':35},
+  'MED_ACTIVE_COOLING':{'lowerLimit':0, 'upperLimit':40},
+  'HI_ACTIVE_COOLING':{'lowerLimit':0, 'upperLimit':45}
+  }
 
 def infer_breach(value, lowerLimit, upperLimit):
   if value < lowerLimit:
@@ -6,41 +11,32 @@ def infer_breach(value, lowerLimit, upperLimit):
     return 'TOO_HIGH'
   return 'NORMAL'
 
-
 def classify_temperature_breach(coolingType, temperatureInC):
-  lowerLimit = 0
-  upperLimit = 0
-  if coolingType == 'PASSIVE_COOLING':
-    lowerLimit = 0
-    upperLimit = 35
-  elif coolingType == 'HI_ACTIVE_COOLING':
-    lowerLimit = 0
-    upperLimit = 45
-  elif coolingType == 'MED_ACTIVE_COOLING':
-    lowerLimit = 0
-    upperLimit = 40
-  return infer_breach(temperatureInC, lowerLimit, upperLimit)
-
+  temperature_range=individual_temperature_range[coolingType]
+  return infer_breach(temperatureInC, temperature_range['lowerLimit'], temperature_range['upperLimit'])
 
 def check_and_alert(alertTarget, batteryChar, temperatureInC):
-  breachType =\
-    classify_temperature_breach(batteryChar['coolingType'], temperatureInC)
-  if alertTarget == 'TO_CONTROLLER':
-    send_to_controller(breachType)
-  elif alertTarget == 'TO_EMAIL':
-    send_to_email(breachType)
-
+  breachType =classify_temperature_breach(batteryChar['coolingType'], temperatureInC)
+  message_target[alertTarget](breachType)
 
 def send_to_controller(breachType):
   header = 0xfeed
   print(f'{header}, {breachType}')
-
-
+  
+   
 def send_to_email(breachType):
   recepient = "a.b@c.com"
-  if breachType == 'TOO_LOW':
-    print(f'To: {recepient}')
-    print('Hi, the temperature is too low')
-  elif breachType == 'TOO_HIGH':
-    print(f'To: {recepient}')
-    print('Hi, the temperature is too high')
+  text_msg={
+    'TOO_LOW':'too low',
+    'TOO_HIGH':'too high'
+    }
+  def print_mail(message):
+    if(message!=None):
+      print(f'To: {recepient}')
+      print(f'Hi, the temperature is {message}')
+  return print_mail(text_msg.get(breachType))
+
+message_target={
+  'to_console':send_to_controller,
+  'to_email':send_to_email
+  }
