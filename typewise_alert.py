@@ -19,6 +19,10 @@ def check_and_alert(alertTarget, batteryChar, temperatureInC):
   breachType =classify_temperature_breach(batteryChar['coolingType'], temperatureInC)
   message_target[alertTarget](breachType)
 
+def send_to_console(breachType):
+  header = 'Console:'
+  print(f'{header}, {breachType}')
+
 def send_to_controller(breachType):
   header = 0xfeed
   print(f'{header}, {breachType}')
@@ -37,6 +41,7 @@ def send_to_email(breachType):
   return print_mail(text_msg.get(breachType))
 
 message_target={
-  'to_console':send_to_controller,
+  'to_console':send_to_console,
+  'to_controller':send_to_controller,
   'to_email':send_to_email
   }

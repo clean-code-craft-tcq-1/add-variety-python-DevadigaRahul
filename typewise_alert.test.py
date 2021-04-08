@@ -14,12 +14,18 @@ class TypewiseTest(unittest.TestCase):
     
   def test_infers_breach_for_NORMAL_max_minus_one(self):#(max-1)<(max)
     self.assertTrue(typewise_alert.infer_breach(29, 20, 30) == 'NORMAL')
-  
-  def test_check_and_alert_to_controller(self):
+
+  def test_check_and_alert_to_console(self):
     batteryChar1={
     'coolingType':'PASSIVE_COOLING'
     }
     self.assertEqual(typewise_alert.check_and_alert('to_console', batteryChar1, 1),None)
+    
+  def test_check_and_alert_to_controller(self):
+    batteryChar1={
+    'coolingType':'PASSIVE_COOLING'
+    }
+    self.assertEqual(typewise_alert.check_and_alert('to_controller', batteryChar1, 16),None)
 
   def test_check_and_alert_to_email_if_too_high(self):#Positive case:Not none
     batteryChar2={
@@ -41,3 +47,4 @@ class TypewiseTest(unittest.TestCase):
 
 if __name__ == '__main__':
   unittest.main()
+
